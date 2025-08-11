@@ -1,5 +1,7 @@
 from django.urls import path
-from . import views
-urlpatterns = [
-    path("", views.home, name="crm_home"),
-]
+from django.http import HttpResponse
+
+def home(_):
+    return HttpResponse("CRM app is working.")
+
+urlpatterns = [ path("", home, name="crm_home") ]
