@@ -19,22 +19,26 @@ def bootstrap(request):
     return HttpResponse("Owner already exists. Go to /admin")
 
 def migrate_now(request):
-    out_before = StringIO()
-    call_command("showmigrations", stdout=out_before, verbosity=1)
+    from io import StringIO
+    from django.conf import settings
+    from django.apps import apps
+
     out = StringIO()
     try:
-        # Force-create migrations if needed, then migrate
+        out.write("INSTALLED_APPS:\n" + "\n".join(settings.INSTALLED_APPS) + "\n\n")
+        out.write("Loaded app configs:\n" + "\n".join(a.name for a in apps.get_app_configs()) + "\n\n")
+
+        # Ensure crm has migrations, then apply crm explicitly, then everything
         call_command("makemigrations", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
+        call_command("migrate", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
         call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
+
         out_after = StringIO()
-        call_command("showmigrations", stdout=out_after, verbosity=1)
-        return HttpResponse(
-            "MIGRATE OK<br><pre>BEFORE:\n" + out_before.getvalue()
-            + "\nRUN:\n" + out.getvalue()
-            + "\nAFTER:\n" + out_after.getvalue() + "</pre>"
-        )
+        call_command("showmigrations", "crm", stdout=out_after, verbosity=1)
+        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "\nCRM migrations:\n" + out_after.getvalue() + "</pre>")
     except Exception:
         return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
+
 
 def seed(request):
     try:
