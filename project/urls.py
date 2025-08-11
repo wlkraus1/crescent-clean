@@ -39,3 +39,10 @@ urlpatterns = [
     path("portal/", include("portal.urls")),
     path("", home),
 ]
+from django.core.management import call_command
+
+def syncdb(request):
+    # create or update tables for the crm app
+    call_command("makemigrations", "crm", interactive=False, verbosity=0)
+    call_command("migrate", interactive=False, verbosity=0)
+    return HttpResponse("Database synced. Now visit /seed")
