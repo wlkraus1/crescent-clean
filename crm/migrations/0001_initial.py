@@ -4,11 +4,7 @@ from django.conf import settings
 
 class Migration(migrations.Migration):
     initial = True
-
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
-
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
     operations = [
         migrations.CreateModel(
             name='Household',
@@ -44,7 +40,7 @@ class Migration(migrations.Migration):
                 ('custodian', models.CharField(default='Schwab', max_length=100)),
                 ('account_number_last4', models.CharField(blank=True, max_length=4)),
                 ('account_type', models.CharField(default='Brokerage', max_length=100)),
-                ('tax_status', models.CharField(choices=[('Taxable', 'Taxable'), ('Traditional IRA', 'Traditional IRA'), ('Roth IRA', 'Roth IRA'), ('SEP IRA', 'SEP IRA')], default='Taxable', max_length=50)),
+                ('tax_status', models.CharField(choices=[('Taxable','Taxable'),('Traditional IRA','Traditional IRA'),('Roth IRA','Roth IRA'),('SEP IRA','SEP IRA')], default='Taxable', max_length=50)),
                 ('model', models.CharField(blank=True, max_length=100)),
                 ('opened_on', models.DateField(blank=True, null=True)),
                 ('status', models.CharField(default='Active', max_length=50)),
@@ -71,8 +67,8 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=200)),
                 ('due_on', models.DateField()),
                 ('assigned_to', models.CharField(blank=True, max_length=100)),
-                ('status', models.CharField(choices=[('Open', 'Open'), ('Done', 'Done')], default='Open', max_length=20)),
-                ('priority', models.CharField(choices=[('Low', 'Low'), ('Normal', 'Normal'), ('High', 'High')], default='Normal', max_length=20)),
+                ('status', models.CharField(choices=[('Open','Open'),('Done','Done')], default='Open', max_length=20)),
+                ('priority', models.CharField(choices=[('Low','Low'),('Normal','Normal'),('High','High')], default='Normal', max_length=20)),
                 ('client', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tasks', to='crm.client')),
                 ('household', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='crm.household')),
             ],
