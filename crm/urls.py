@@ -1,3 +1,6 @@
 from django.urls import path
 from . import views
-urlpatterns = [ path("", views.home, name="crm_home") ]
+
+urlpatterns = [
+    path("", views.home, name="crm_home"),
+]
