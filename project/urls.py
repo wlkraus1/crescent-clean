@@ -19,15 +19,16 @@ def bootstrap(request):
     return HttpResponse("Owner already exists. Go to /admin")
 
 def migrate_now(request):
-    """
-    Run migrations from the browser and show the output.
-    """
+    from io import StringIO
     out = StringIO()
     try:
+        # make sure crm has migrations, then apply all
+        call_command("makemigrations", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
         call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
         return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
     except Exception:
         return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
+
 
 def seed(request):
     """
