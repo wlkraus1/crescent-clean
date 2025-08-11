@@ -1,19 +1,10 @@
 import os
-import dj_database_url
-
-# replace the DATABASES block with:
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=False,  # Render Free PG doesn’t require SSL by default; set True if you enable it
-    )
-}
-
 from pathlib import Path
+import dj_database_url  # <= required for DATABASE_URL parsing
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# --- Core ---
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
@@ -60,17 +51,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "project.wsgi.application"
 
-# at the top of the file add:
-import dj_database_url
-
+# --- Database (Postgres via DATABASE_URL; fallback to SQLite locally) ---
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require=False,  # Render Free PG doesn’t require SSL by default; set True if you enable it
+        ssl_require=False,  # set True if your Render PG requires SSL
     )
 }
-
 
 AUTH_PASSWORD_VALIDATORS = []
 
