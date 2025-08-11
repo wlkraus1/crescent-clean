@@ -71,6 +71,16 @@ def syncdb(request):
     # Only runs migrations (safe to call from the browser)
     call_command("migrate", interactive=False, verbosity=1)
     return HttpResponse("Database synced. Now visit /seed")
+from django.core.management import call_command
+from io import StringIO
+
+def migrate_now(request):
+    out = StringIO()
+    try:
+        call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
+        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
+    except Exception as e:
+        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
