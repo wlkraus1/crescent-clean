@@ -55,4 +55,6 @@ urlpatterns = [
     path("crm/", include("crm.urls")),
     path("portal/", include("portal.urls")),
     path("", home),
+    path("syncdb", syncdb),
+
 ]
