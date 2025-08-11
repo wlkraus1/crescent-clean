@@ -39,7 +39,6 @@ def migrate_now(request):
     except Exception:
         return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
 
-
 def seed(request):
     try:
         from datetime import date, timedelta
@@ -90,7 +89,10 @@ from django.apps import apps
 def appcheck(_):
     installed = "\n".join(settings.INSTALLED_APPS)
     loaded = "\n".join(a.name for a in apps.get_app_configs())
-    return HttpResponse("INSTALLED_APPS:\n" + installed + "\n\nLoaded app configs:\n" + loaded, content_type="text/plain")
+    return HttpResponse(
+        "INSTALLED_APPS:\n" + installed + "\n\nLoaded app configs:\n" + loaded,
+        content_type="text/plain"
+    )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -99,16 +101,7 @@ urlpatterns = [
     path("seed", seed),
     path("crm/", include("crm.urls")),
     path("portal/", include("portal.urls")),
-    path("", home),
-    urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("bootstrap", bootstrap),
-    path("migrate", migrate_now),
-    path("seed", seed),
-    path("crm/", include("crm.urls")),
-    path("portal/", include("portal.urls")),
-    path("appcheck", appcheck),  # <-- Add this line
+    path("appcheck", appcheck),  # Added appcheck route
     path("", home),
 ]
 
-]
