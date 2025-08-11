@@ -62,4 +62,3 @@ class Document(models.Model):
     location = models.CharField(max_length=255, help_text='Placeholder path or URL')
     immutable_flag = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
