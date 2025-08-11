@@ -40,6 +40,12 @@ def seed(request):
                         status='Open', priority='High')
     Document.objects.create(household=h, client=c1, title='[DEMO] Investment Policy Statement', location='demo/ips.pdf')
     return HttpResponse("Seeded demo. Visit /portal/household/1/")
+from django.core.management import call_command
+
+def syncdb(request):
+    # Only runs migrations (safe to call from the browser)
+    call_command("migrate", interactive=False, verbosity=1)
+    return HttpResponse("Database synced. Now visit /seed")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
