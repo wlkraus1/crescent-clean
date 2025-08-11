@@ -17,22 +17,26 @@ def bootstrap(request):
         User.objects.create_superuser(username=email, email=email, password=pwd)
         return HttpResponse(f"Owner created for {email}. Now go to /admin")
     return HttpResponse("Owner already exists. Go to /admin")
+
 def migrate_now(request):
-    from io import StringIO
+    out_before = StringIO()
+    call_command("showmigrations", stdout=out_before, verbosity=1)
     out = StringIO()
     try:
-        # Make migrations for all apps (including crm), then migrate
-        call_command("makemigrations", interactive=False, stdout=out, stderr=out, verbosity=1)
+        # Force-create migrations if needed, then migrate
+        call_command("makemigrations", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
         call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
-        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
-    except Exception as e:
-        return HttpResponse("MIGRATE ERROR<br><pre>" + str(e) + "\n" + out.getvalue() + "</pre>", status=500)
-
+        out_after = StringIO()
+        call_command("showmigrations", stdout=out_after, verbosity=1)
+        return HttpResponse(
+            "MIGRATE OK<br><pre>BEFORE:\n" + out_before.getvalue()
+            + "\nRUN:\n" + out.getvalue()
+            + "\nAFTER:\n" + out_after.getvalue() + "</pre>"
+        )
+    except Exception:
+        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
 
 def seed(request):
-    """
-    Insert simple demo data (safe to run once).
-    """
     try:
         from datetime import date, timedelta
         from crm.models import Household, Client, Account, Holding, Task, Document
