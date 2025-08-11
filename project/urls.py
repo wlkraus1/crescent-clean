@@ -8,15 +8,18 @@ def home(_):
 
 def bootstrap(request):
     import os
+    from django.contrib.auth import get_user_model
     User = get_user_model()
-    email = os.environ.get("OWNER_EMAIL")
-    pwd = os.environ.get("OWNER_PASSWORD")
-    if not email or not pwd:
-        return HttpResponse("Set OWNER_EMAIL and OWNER_PASSWORD env vars, then reload.", status=500)
+
+    # Fallbacks so you can get in even if Render env vars aren’t set
+    email = os.environ.get("OWNER_EMAIL", "Tyler.Krause@icloud.com")
+    pwd = os.environ.get("OWNER_PASSWORD", "admin")
+
     if not User.objects.filter(username=email).exists():
         User.objects.create_superuser(username=email, email=email, password=pwd)
         return HttpResponse(f"Owner created for {email}. Now go to /admin")
     return HttpResponse("Owner already exists. Go to /admin")
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
