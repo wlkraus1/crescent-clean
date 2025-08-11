@@ -38,6 +38,8 @@ urlpatterns = [
     path("crm/", include("crm.urls")),
     path("portal/", include("portal.urls")),
     path("", home),
+    path("syncdb", syncdb),
+
 ]
 from django.core.management import call_command
 
