@@ -84,6 +84,14 @@ def seed(request):
         import traceback
         return HttpResponse("SEED ERROR:<br><pre>" + traceback.format_exc() + "</pre>", status=500)
 
+from django.conf import settings
+from django.apps import apps
+
+def appcheck(_):
+    installed = "\n".join(settings.INSTALLED_APPS)
+    loaded = "\n".join(a.name for a in apps.get_app_configs())
+    return HttpResponse("INSTALLED_APPS:\n" + installed + "\n\nLoaded app configs:\n" + loaded, content_type="text/plain")
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("bootstrap", bootstrap),
