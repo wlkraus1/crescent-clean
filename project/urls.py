@@ -17,17 +17,16 @@ def bootstrap(request):
         User.objects.create_superuser(username=email, email=email, password=pwd)
         return HttpResponse(f"Owner created for {email}. Now go to /admin")
     return HttpResponse("Owner already exists. Go to /admin")
-
 def migrate_now(request):
     from io import StringIO
     out = StringIO()
     try:
-        # make sure crm has migrations, then apply all
-        call_command("makemigrations", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
+        # Make migrations for all apps (including crm), then migrate
+        call_command("makemigrations", interactive=False, stdout=out, stderr=out, verbosity=1)
         call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
         return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
-    except Exception:
-        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
+    except Exception as e:
+        return HttpResponse("MIGRATE ERROR<br><pre>" + str(e) + "\n" + out.getvalue() + "</pre>", status=500)
 
 
 def seed(request):
