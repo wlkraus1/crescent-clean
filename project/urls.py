@@ -100,4 +100,15 @@ urlpatterns = [
     path("crm/", include("crm.urls")),
     path("portal/", include("portal.urls")),
     path("", home),
+    urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("bootstrap", bootstrap),
+    path("migrate", migrate_now),
+    path("seed", seed),
+    path("crm/", include("crm.urls")),
+    path("portal/", include("portal.urls")),
+    path("appcheck", appcheck),  # <-- Add this line
+    path("", home),
+]
+
 ]
