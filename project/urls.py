@@ -116,5 +116,7 @@ urlpatterns = [
     path("portal/", include("portal.urls")),
     path("appcheck", appcheck),  # Added appcheck route
     path("", home),
+    path("migcheck", migcheck),
+
 ]
 
