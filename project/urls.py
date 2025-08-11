@@ -1,11 +1,11 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 import os
 
 def home(_):
-    return HttpResponse("Crescent CRM is live. Use /bootstrap then /admin.")
+    return HttpResponse("Crescent CRM is live. Visit /crm or /portal.")
 
 def bootstrap(request):
     User = get_user_model()
@@ -19,5 +19,7 @@ def bootstrap(request):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("bootstrap", bootstrap),
+    path("crm/", include("crm.urls")),      # CRM section
+    path("portal/", include("portal.urls")),  # Client Portal section
     path("", home),
 ]
