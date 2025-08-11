@@ -91,7 +91,22 @@ def appcheck(_):
         "INSTALLED_APPS:\n" + installed + "\n\nLoaded app configs:\n" + loaded,
         content_type="text/plain"
     )
-
+def migcheck(request):
+    import importlib, pkgutil, os, sys
+    lines = []
+    try:
+        m = importlib.import_module("crm.migrations")
+        lines.append("Imported crm.migrations OK: " + str(m))
+        path = os.path.dirname(m.__file__)
+        lines.append("crm.migrations path: " + path)
+        files = sorted([f for f in os.listdir(path)])
+        lines.append("Files in crm/migrations: " + ", ".join(files))
+        # list discovered migration modules
+        mods = [name for _, name, _ in pkgutil.iter_modules([path])]
+        lines.append("Python modules in crm/migrations: " + ", ".join(mods))
+    except Exception as e:
+        lines.append("ERROR importing crm.migrations: " + repr(e))
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("bootstrap", bootstrap),
