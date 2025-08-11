@@ -3,10 +3,11 @@ from django.urls import path, include
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
+from io import StringIO
 import os
 
 def home(_):
-    return HttpResponse("Crescent CRM is live. Run /syncdb then /seed once, then visit /portal/household/1/ or /admin")
+    return HttpResponse("Crescent CRM is live. Use /migrate once, then /seed. Try /portal/household/1/ and /admin.")
 
 def bootstrap(request):
     User = get_user_model()
@@ -17,12 +18,21 @@ def bootstrap(request):
         return HttpResponse(f"Owner created for {email}. Now go to /admin")
     return HttpResponse("Owner already exists. Go to /admin")
 
-def syncdb(request):
-    call_command("makemigrations", "crm", interactive=False, verbosity=0)
-    call_command("migrate", interactive=False, verbosity=0)
-    return HttpResponse("Database synced. Now visit /seed")
+def migrate_now(request):
+    """
+    Run migrations from the browser and show the output.
+    """
+    out = StringIO()
+    try:
+        call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
+        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
+    except Exception:
+        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
 
 def seed(request):
+    """
+    Insert simple demo data (safe to run once).
+    """
     try:
         from datetime import date, timedelta
         from crm.models import Household, Client, Account, Holding, Task, Document
@@ -66,30 +76,12 @@ def seed(request):
         import traceback
         return HttpResponse("SEED ERROR:<br><pre>" + traceback.format_exc() + "</pre>", status=500)
 
-
-def syncdb(request):
-    # Only runs migrations (safe to call from the browser)
-    call_command("migrate", interactive=False, verbosity=1)
-    return HttpResponse("Database synced. Now visit /seed")
-from django.core.management import call_command
-from io import StringIO
-
-def migrate_now(request):
-    out = StringIO()
-    try:
-        call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
-        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "</pre>")
-    except Exception as e:
-        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("bootstrap", bootstrap),
-    path("syncdb", syncdb),
+    path("migrate", migrate_now),
     path("seed", seed),
     path("crm/", include("crm.urls")),
     path("portal/", include("portal.urls")),
     path("", home),
-    path("syncdb", syncdb),
-
 ]
