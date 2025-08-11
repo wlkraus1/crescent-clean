@@ -8,7 +8,8 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","*").split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin","django.contrib.auth","django.contrib.contenttypes",
-    "django.contrib.sessions","django.contrib.messages","django.contrib.staticfiles"
+    "django.contrib.sessions","django.contrib.messages","django.contrib.staticfiles",
+    "crm", "portal",  # << add these
 ]
 
 MIDDLEWARE = [
@@ -39,4 +40,5 @@ DATABASES = {"default":{"ENGINE":"django.db.backends.sqlite3","NAME": BASE_DIR/"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR/"staticfiles"
+STATICFILES_DIRS = [BASE_DIR/"static"]  # << add this
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
