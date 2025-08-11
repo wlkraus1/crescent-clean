@@ -1,4 +1,15 @@
 import os
+import dj_database_url
+
+# replace the DATABASES block with:
+DATABASES = {
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=False,  # Render Free PG doesn’t require SSL by default; set True if you enable it
+    )
+}
+
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,12 +60,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "project.wsgi.application"
 
+# at the top of the file add:
+import dj_database_url
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=False,  # Render Free PG doesn’t require SSL by default; set True if you enable it
+    )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = []
 
