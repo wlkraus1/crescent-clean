@@ -20,24 +20,22 @@ def bootstrap(request):
 
 def migrate_now(request):
     from io import StringIO
-    from django.conf import settings
     from django.apps import apps
-
     out = StringIO()
     try:
-        out.write("INSTALLED_APPS:\n" + "\n".join(settings.INSTALLED_APPS) + "\n\n")
-        out.write("Loaded app configs:\n" + "\n".join(a.name for a in apps.get_app_configs()) + "\n\n")
-
-        # Ensure crm has migrations, then apply crm explicitly, then everything
+        # make sure CRM migration file exists (generate if missing)
         call_command("makemigrations", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
+        # apply ONLY crm first (so tables are created), then all apps (idempotent)
         call_command("migrate", "crm", interactive=False, stdout=out, stderr=out, verbosity=1)
         call_command("migrate", interactive=False, stdout=out, stderr=out, verbosity=1)
 
-        out_after = StringIO()
-        call_command("showmigrations", "crm", stdout=out_after, verbosity=1)
-        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "\nCRM migrations:\n" + out_after.getvalue() + "</pre>")
-    except Exception:
-        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "</pre>", status=500)
+        out2 = StringIO()
+        call_command("showmigrations", "crm", stdout=out2, verbosity=1)
+        return HttpResponse("MIGRATE OK<br><pre>" + out.getvalue() + "\nCRM:\n" + out2.getvalue() + "</pre>")
+    except Exception as e:
+        import traceback
+        return HttpResponse("MIGRATE ERROR<br><pre>" + out.getvalue() + "\n" + traceback.format_exc() + "</pre>", status=500)
+
 
 def seed(request):
     try:
